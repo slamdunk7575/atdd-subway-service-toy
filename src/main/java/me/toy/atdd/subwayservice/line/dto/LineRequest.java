@@ -1,6 +1,7 @@
 package me.toy.atdd.subwayservice.line.dto;
 
 import me.toy.atdd.subwayservice.line.domain.Line;
+import me.toy.atdd.subwayservice.station.domain.Station;
 
 public class LineRequest {
     private String name;
@@ -40,7 +41,13 @@ public class LineRequest {
         return distance;
     }
 
-    public Line toLine() {
-        return new Line(name, color);
+    public Line toLine(final Station upStation, final Station downStation) {
+        return Line.builder()
+                .name(name)
+                .color(color)
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(distance)
+                .build();
     }
 }

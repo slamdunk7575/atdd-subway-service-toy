@@ -1,10 +1,12 @@
 package me.toy.atdd.subwayservice.line.domain;
 
+import lombok.Builder;
 import me.toy.atdd.subwayservice.BaseEntity;
 import me.toy.atdd.subwayservice.station.domain.Station;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -19,8 +21,8 @@ public class Line extends BaseEntity {
 
     private String color;
 
-    @OneToMany(mappedBy = "line", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Section> sections = new ArrayList<>();
+    @Embedded
+    private Sections sections;
 
     public Line() {
     }
@@ -30,10 +32,15 @@ public class Line extends BaseEntity {
         this.color = color;
     }
 
+    @Builder
     public Line(String name, String color, Station upStation, Station downStation, int distance) {
         this.name = name;
         this.color = color;
-        sections.add(new Section(this, upStation, downStation, distance));
+        this.sections = new Sections(Arrays.asList(Section.builder().line(this)
+                .upStation(upStation)
+                .downStation(downStation)
+                .distance(new Distance(distance))
+                .build()));
     }
 
     public void update(Line line) {
@@ -54,6 +61,10 @@ public class Line extends BaseEntity {
     }
 
     public List<Section> getSections() {
-        return sections;
+        return sections.getSections();
+    }
+
+    public List<Station> getStations() {
+        return sections.getStation();
     }
 }

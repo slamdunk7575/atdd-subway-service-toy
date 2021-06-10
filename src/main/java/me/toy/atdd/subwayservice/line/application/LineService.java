@@ -33,14 +33,10 @@ public class LineService {
     public LineResponse saveLine(LineRequest request) {
         Station upStation = stationService.findById(request.getUpStationId());
         Station downStation = stationService.findById(request.getDownStationId());
-        Line persistLine = lineRepository.save(new Line(request.getName(), request.getColor(), upStation, downStation, request.getDistance()));
-
-        List<StationResponse> stations = getStations(persistLine).stream()
-                .map(it -> StationResponse.of(it))
-                .collect(Collectors.toList());
-
-        return LineResponse.of(persistLine, stations);
+        Line persistLine = lineRepository.save(request.toLine(upStation, downStation));
+        return LineResponse.of(persistLine);
     }
+
 
     private List<Station> getStations(Line line) {
         if (line.getSections().isEmpty()) {
@@ -117,7 +113,7 @@ public class LineService {
     }
 
     public void addLineStation(Long lineId, SectionRequest request) {
-        Line line = findLineById(lineId);
+        /*Line line = findLineById(lineId);
         Station upStation = stationService.findStationById(request.getUpStationId());
         Station downStation = stationService.findStationById(request.getDownStationId());
 
@@ -154,11 +150,11 @@ public class LineService {
             line.getSections().add(new Section(line, upStation, downStation, request.getDistance()));
         } else {
             throw new RuntimeException();
-        }
+        }*/
     }
 
     public void removeLineStation(Long lineId, Long stationId) {
-        Line line = findLineById(lineId);
+        /*Line line = findLineById(lineId);
         Station station = stationService.findStationById(stationId);
 
         if (line.getSections().size() <= 1) {
@@ -181,6 +177,6 @@ public class LineService {
         }
 
         upLineStation.ifPresent(it -> line.getSections().remove(it));
-        downLineStation.ifPresent(it -> line.getSections().remove(it));
+        downLineStation.ifPresent(it -> line.getSections().remove(it));*/
     }
 }
