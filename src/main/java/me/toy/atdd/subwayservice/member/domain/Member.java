@@ -22,7 +22,7 @@ public class Member extends BaseEntity {
 
     private Integer age;
 
-    public Member() {
+    protected Member() {
     }
 
     public Member(String email, String password, Integer age) {

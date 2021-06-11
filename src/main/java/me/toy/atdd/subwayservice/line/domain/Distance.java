@@ -53,4 +53,8 @@ public class Distance {
     public int hashCode() {
         return Objects.hash(distance);
     }
+
+    public int get() {
+        return distance;
+    }
 }

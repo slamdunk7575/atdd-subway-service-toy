@@ -41,6 +41,10 @@ public class LineRequest {
         return distance;
     }
 
+    public Line toLine() {
+        return new Line(name, color);
+    }
+
     public Line toLine(final Station upStation, final Station downStation) {
         return Line.builder()
                 .name(name)

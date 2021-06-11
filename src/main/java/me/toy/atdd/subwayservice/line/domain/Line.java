@@ -2,12 +2,13 @@ package me.toy.atdd.subwayservice.line.domain;
 
 import lombok.Builder;
 import me.toy.atdd.subwayservice.BaseEntity;
+import me.toy.atdd.subwayservice.line.dto.LineResponse;
 import me.toy.atdd.subwayservice.station.domain.Station;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Line extends BaseEntity {
@@ -24,7 +25,7 @@ public class Line extends BaseEntity {
     @Embedded
     private Sections sections;
 
-    public Line() {
+    protected Line() {
     }
 
     public Line(String name, String color) {
@@ -43,9 +44,23 @@ public class Line extends BaseEntity {
                 .build()));
     }
 
+    public static List<LineResponse> ofList(List<Line> lines) {
+        return lines.stream()
+                .map(LineResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public void add(Section section) {
+        sections.addSection(section);
+    }
+
     public void update(Line line) {
         this.name = line.getName();
         this.color = line.getColor();
+    }
+
+    public void remove(Station station) {
+        sections.removeSection(this, station);
     }
 
     public Long getId() {
@@ -65,6 +80,7 @@ public class Line extends BaseEntity {
     }
 
     public List<Station> getStations() {
-        return sections.getStation();
+        return sections.getStations();
     }
+
 }
