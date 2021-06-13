@@ -22,23 +22,16 @@ public class Distance {
 
     private void validateInitDistance(int distance) {
         if (distance < MIN_DISTANCE) {
-            throw new IllegalArgumentException("거리는 음수가 될 수 없습니다.");
+            throw new IllegalArgumentException("거리는 0 또는 음수가 될 수 없습니다.");
         }
     }
 
     public Distance addDistance(Distance newDistance) {
-        return new Distance(this.distance += newDistance.distance);
+        return new Distance(this.distance + newDistance.distance);
     }
 
     public Distance minusDistance(Distance newDistance) {
-        validateDistance(newDistance.distance);
-        return new Distance(this.distance -= newDistance.distance);
-    }
-
-    private void validateDistance(int newDistance) {
-        if (this.distance <= newDistance) {
-            throw new IllegalArgumentException("기존 역사이 길이보다 크거나 같으면 등록할 수 없습니다.");
-        }
+        return new Distance(this.distance - newDistance.distance);
     }
 
     @Override
