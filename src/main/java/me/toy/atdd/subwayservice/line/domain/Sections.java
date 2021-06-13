@@ -151,13 +151,13 @@ public class Sections {
 
     private Optional<Section> findByUpSection(Station removeStation) {
         return sections.stream()
-                .filter(section -> section.getUpStation().equals(removeStation))
+                .filter(section -> section.isSameUpStation(removeStation))
                 .findFirst();
     }
 
     private Optional<Section> findByDownSection(Station removeStation) {
         return sections.stream()
-                .filter(section -> section.getDownStation().equals(removeStation))
+                .filter(section -> section.isSameDownStation(removeStation))
                 .findFirst();
     }
 

@@ -48,6 +48,14 @@ public class Section {
         this.distance = this.distance.minusDistance(newDistance);
     }
 
+    public boolean isSameUpStation(Station removeStation) {
+        return this.upStation.equals(removeStation);
+    }
+
+    public boolean isSameDownStation(Station removeStation) {
+        return this.downStation.equals(removeStation);
+    }
+
     public Long getId() {
         return id;
     }
