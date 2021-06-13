@@ -5,7 +5,7 @@ import me.toy.atdd.subwayservice.station.domain.Station;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Embeddable
 public class Sections {
@@ -125,20 +125,21 @@ public class Sections {
     public void removeSection(Line line, Station station) {
         validateRemoveSection();
 
-        Optional<Section> upSection = findByUpSection(station);
-        Optional<Section> downSection = findByDownSection(station);
-        validateRemoveStations(upSection.isPresent(), downSection.isPresent());
+        Section upSection = findSectionByUpSection(station);
+        Section downSection = findSectionByDownSection(station);
 
-        if (canRemove(upSection.isPresent(), downSection.isPresent())) {
-            removeMiddleStation(line, upSection.get(), downSection.get());
+        if (Objects.nonNull(upSection) && Objects.nonNull(downSection)) {
+            removeMiddleStation(line, upSection, downSection);
         }
 
-        upSection.ifPresent(section -> sections.remove(section));
-        downSection.ifPresent(section -> sections.remove(section));
+        validateRemoveStations(upSection, downSection);
+
+        sections.remove(upSection);
+        sections.remove(downSection);
     }
 
-    private void validateRemoveStations(boolean isExistedUpStation, boolean isExistedDownStation) {
-        if (!isExistedUpStation && !isExistedDownStation) {
+    private void validateRemoveStations(Section upSection, Section downSection) {
+        if (Objects.isNull(upSection) && Objects.isNull(downSection)) {
             throw new IllegalArgumentException("노선에 등록되지 않은 역은 제거할 수 없습니다.");
         }
     }
@@ -149,20 +150,18 @@ public class Sections {
         }
     }
 
-    private Optional<Section> findByUpSection(Station removeStation) {
+    private Section findSectionByUpSection(Station removeStation) {
         return sections.stream()
                 .filter(section -> section.isSameUpStation(removeStation))
-                .findFirst();
+                .findFirst()
+                .orElse(null);
     }
 
-    private Optional<Section> findByDownSection(Station removeStation) {
+    private Section findSectionByDownSection(Station removeStation) {
         return sections.stream()
                 .filter(section -> section.isSameDownStation(removeStation))
-                .findFirst();
-    }
-
-    public boolean canRemove(boolean upStation, boolean downStation) {
-        return upStation && downStation;
+                .findFirst()
+                .orElse(null);
     }
 
     private void removeMiddleStation(Line line, Section upSection, Section downSection) {

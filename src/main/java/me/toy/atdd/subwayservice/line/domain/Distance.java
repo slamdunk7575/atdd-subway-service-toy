@@ -21,7 +21,7 @@ public class Distance {
     }
 
     private void validateInitDistance(int distance) {
-        if (distance < MIN_DISTANCE) {
+        if (distance <= MIN_DISTANCE) {
             throw new IllegalArgumentException("거리는 0 또는 음수가 될 수 없습니다.");
         }
     }
