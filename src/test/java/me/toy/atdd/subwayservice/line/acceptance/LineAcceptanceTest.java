@@ -1,4 +1,4 @@
-package me.toy.atdd.subwayservice.line;
+package me.toy.atdd.subwayservice.line.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -6,7 +6,7 @@ import io.restassured.response.Response;
 import me.toy.atdd.subwayservice.AcceptanceTest;
 import me.toy.atdd.subwayservice.line.dto.LineRequest;
 import me.toy.atdd.subwayservice.line.dto.LineResponse;
-import me.toy.atdd.subwayservice.station.StationAcceptanceTest;
+import me.toy.atdd.subwayservice.station.acceptance.StationAcceptanceTest;
 import me.toy.atdd.subwayservice.station.dto.StationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

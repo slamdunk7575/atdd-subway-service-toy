@@ -1,4 +1,4 @@
-package me.toy.atdd.subwayservice.station;
+package me.toy.atdd.subwayservice.station.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
