@@ -1,4 +1,4 @@
-package me.toy.atdd.subwayservice.path;
+package me.toy.atdd.subwayservice.path.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -9,7 +9,7 @@ import me.toy.atdd.subwayservice.line.dto.LineResponse;
 import me.toy.atdd.subwayservice.path.dto.PathResponse;
 import me.toy.atdd.subwayservice.station.StationFixtures;
 import me.toy.atdd.subwayservice.station.dto.StationResponse;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -18,9 +18,9 @@ import org.springframework.http.MediaType;
 import java.util.Arrays;
 import java.util.List;
 
-import static me.toy.atdd.subwayservice.line.LineAcceptanceTest.지하철_노선_등록되어_있음;
-import static me.toy.atdd.subwayservice.line.LineSectionAcceptanceTest.지하철_노선에_지하철역_등록_요청;
-import static me.toy.atdd.subwayservice.station.StationAcceptanceTest.지하철역_등록되어_있음;
+import static me.toy.atdd.subwayservice.line.acceptance.LineAcceptanceTest.지하철_노선_등록되어_있음;
+import static me.toy.atdd.subwayservice.line.acceptance.LineSectionAcceptanceTest.지하철_노선에_지하철역_등록_요청;
+import static me.toy.atdd.subwayservice.station.acceptance.StationAcceptanceTest.지하철역_등록되어_있음;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("지하철 경로 조회")
@@ -51,7 +51,7 @@ public class PathAcceptanceTest extends AcceptanceTest {
      * 몽촌토성역  --- *8호선* --- 잠실역
      */
 
-    @BeforeEach
+    @BeforeAll
     public void setUp() {
         super.setUp();
 
