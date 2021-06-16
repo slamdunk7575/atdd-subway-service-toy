@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
-@RestController("/members")
+@RestController
+@RequestMapping("/members")
 public class MemberController {
 
     private MemberService memberService;

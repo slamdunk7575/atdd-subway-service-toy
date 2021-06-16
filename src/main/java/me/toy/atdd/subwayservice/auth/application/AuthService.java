@@ -8,8 +8,6 @@ import me.toy.atdd.subwayservice.member.domain.Member;
 import me.toy.atdd.subwayservice.member.domain.MemberRepository;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
-
 @Service
 public class AuthService {
 
@@ -22,12 +20,15 @@ public class AuthService {
     }
 
     public TokenResponse login(TokenRequest tokenRequest) {
-        Member member = memberRepository.findByEmail(tokenRequest.getEmail())
-                .orElseThrow(EntityNotFoundException::new);
-
+        Member member = getMember(tokenRequest.getEmail());
         member.checkPassword(tokenRequest.getPassword());
         String token = jwtTokenProvider.createToken(tokenRequest.getEmail());
         return new TokenResponse(token);
+    }
+
+    private Member getMember(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(AuthorizationException::new);
     }
 
     public LoginMember findMemberByToken(String credentials) {
@@ -36,8 +37,7 @@ public class AuthService {
         }
 
         String email = jwtTokenProvider.getPayLoad(credentials);
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(EntityNotFoundException::new);
+        Member member = getMember(email);
 
         return new LoginMember(member.getId(), member.getEmail(), member.getAge());
     }

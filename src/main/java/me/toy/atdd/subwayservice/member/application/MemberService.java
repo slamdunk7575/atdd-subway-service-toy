@@ -11,7 +11,11 @@ import javax.persistence.EntityNotFoundException;
 @Service
 public class MemberService {
 
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+
+    public MemberService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
 
     public MemberResponse createMember(MemberRequest memberRequest) {
         Member member = memberRepository.save(memberRequest.toMember());

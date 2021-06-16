@@ -1,6 +1,5 @@
 package me.toy.atdd.subwayservice.auth.application;
 
-import me.toy.atdd.subwayservice.auth.domain.LoginMember;
 import me.toy.atdd.subwayservice.auth.dto.TokenRequest;
 import me.toy.atdd.subwayservice.auth.dto.TokenResponse;
 import me.toy.atdd.subwayservice.auth.infrastructure.JwtTokenProvider;

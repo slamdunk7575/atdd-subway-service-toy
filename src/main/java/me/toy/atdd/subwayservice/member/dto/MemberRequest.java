@@ -1,5 +1,6 @@
 package me.toy.atdd.subwayservice.member.dto;
 
+import lombok.Builder;
 import me.toy.atdd.subwayservice.member.domain.Member;
 
 public class MemberRequest {
@@ -10,6 +11,7 @@ public class MemberRequest {
     public MemberRequest() {
     }
 
+    @Builder
     public MemberRequest(String email, String password, Integer age) {
         this.email = email;
         this.password = password;

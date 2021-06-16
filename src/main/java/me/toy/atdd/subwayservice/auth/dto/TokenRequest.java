@@ -1,5 +1,7 @@
 package me.toy.atdd.subwayservice.auth.dto;
 
+import lombok.Builder;
+
 public class TokenRequest {
 
     private String email;
@@ -8,6 +10,7 @@ public class TokenRequest {
     public TokenRequest() {
     }
 
+    @Builder
     public TokenRequest(String email, String password) {
         this.email = email;
         this.password = password;
