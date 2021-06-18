@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import me.toy.atdd.subwayservice.AcceptanceTest;
+import me.toy.atdd.subwayservice.auth.dto.TokenRequest;
 import me.toy.atdd.subwayservice.member.dto.MemberRequest;
 import me.toy.atdd.subwayservice.member.dto.MemberResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -31,11 +32,46 @@ public class MemberAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> findResponse = 회원_정보_조회_요청(createResponse);
+        // then
         회윈_정보_조회됨(findResponse, EMAIL, AGE);
+
+        // when
+        ExtractableResponse<Response> updateResponse = 회원_정보_수정_요청(createResponse, NEW_EMAIL, NEW_PASSWORD, NEW_AGE);
+        // then
+        회원_정보_수정됨(updateResponse);
+
+        // when
+        ExtractableResponse<Response> deleteResponse = 회원_삭제_요청(createResponse);
+        // then
+        회원_삭제됨(deleteResponse);
     }
 
-    private ExtractableResponse<Response> 회원_생성을_요청(String email, String password, int age) {
-        MemberRequest memberRequest = new MemberRequest(email, password, age);
+    @DisplayName("나의 정보를 관리한다.")
+    @Test
+    void manageMyInfo() {
+        // 로그인
+        회원_생성을_요청(EMAIL, PASSWORD, AGE);
+        String accessToken = 회원_로그인_요청(EMAIL, PASSWORD);
+
+        // 조회
+        ExtractableResponse<Response> 내정보_조회_요청_결과 = 내정보_조회_요청(accessToken);
+        내정보_조회_성공함(내정보_조회_요청_결과, EMAIL, AGE);
+
+        // 수정
+        ExtractableResponse<Response> 내정보_수정_요청_결과 = 내정보_수정_요청(accessToken, NEW_EMAIL, NEW_PASSWORD, NEW_AGE);
+        내정보_수정_성공함(내정보_수정_요청_결과);
+
+        // 삭제
+        ExtractableResponse<Response> 내정보_삭제_요청_결과 = 내정보_삭제_요청(accessToken);
+        내정보_삭제_성공함(내정보_삭제_요청_결과);
+    }
+
+    public static ExtractableResponse<Response> 회원_생성을_요청(String email, String password, Integer age) {
+        MemberRequest memberRequest = MemberRequest.builder()
+                .email(email)
+                .password(password)
+                .age(age)
+                .build();
 
         return RestAssured
                 .given().log().all()
@@ -55,7 +91,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
 
         return RestAssured
                 .given().log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
+                    .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when().get(uri)
                 .then().log().all()
                 .extract();
@@ -68,4 +104,105 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         assertThat(memberResponse.getAge()).isEqualTo(age);
     }
 
+    private ExtractableResponse<Response> 회원_정보_수정_요청(ExtractableResponse<Response> response, String newEmail, String newPassword, int newAge) {
+        String uri = response.header("Location");
+
+        MemberRequest memberRequest = MemberRequest.builder()
+                .email(newEmail)
+                .password(newPassword)
+                .age(newAge)
+                .build();
+
+        return RestAssured
+                .given().log().all()
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .body(memberRequest)
+                .when()
+                    .put(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    public static void 회원_정보_수정됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private ExtractableResponse<Response> 회원_삭제_요청(ExtractableResponse<Response> response) {
+        String uri = response.header("Location");
+        return RestAssured
+                .given().log().all()
+                .when().delete(uri)
+                .then().log().all()
+                .extract();
+    }
+
+    private void 회원_삭제됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    public static String 회원_로그인_요청(String email, String password) {
+        TokenRequest tokenRequest = TokenRequest.builder()
+                .email(email)
+                .password(password)
+                .build();
+
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(tokenRequest)
+                .when().post("/login/token")
+                .then().log().all()
+                .extract();
+
+        return response.body().jsonPath().get("accessToken");
+    }
+
+    public static ExtractableResponse<Response> 내정보_조회_요청(String testToken) {
+        return RestAssured
+                .given().log().all()
+                .auth().oauth2(testToken)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/members/me")
+                .then().log().all()
+                .extract();
+    }
+
+    public static void 내정보_조회_성공함(ExtractableResponse<Response> 내정보_조회_요청_결과, String email, int age) {
+        MemberResponse memberResponse = 내정보_조회_요청_결과.as(MemberResponse.class);
+        assertThat(memberResponse.getEmail()).isEqualTo(email);
+        assertThat(memberResponse.getAge()).isEqualTo(age);
+    }
+
+    public static ExtractableResponse<Response> 내정보_수정_요청(String accessToken, String newEmail, String newPassword, int newAge) {
+        MemberRequest memberRequest = MemberRequest.builder()
+                .email(newEmail)
+                .password(newPassword)
+                .age(newAge)
+                .build();
+
+        return RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(memberRequest)
+                .when().put("/members/me")
+                .then().log().all()
+                .extract();
+    }
+
+    public void 내정보_수정_성공함(ExtractableResponse<Response> 내정보_수정_결과) {
+        assertThat(내정보_수정_결과.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private ExtractableResponse<Response> 내정보_삭제_요청(String accessToken) {
+        return RestAssured
+                .given().log().all()
+                .auth().oauth2(accessToken)
+                .when().delete("/members/me")
+                .then().log().all()
+                .extract();
+    }
+
+    private void 내정보_삭제_성공함(ExtractableResponse<Response> 내정보_삭제_요청_결과) {
+        assertThat(내정보_삭제_요청_결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
 }

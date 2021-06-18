@@ -1,5 +1,6 @@
 package me.toy.atdd.subwayservice.member.ui;
 
+import me.toy.atdd.subwayservice.auth.domain.AuthenticationPrincipal;
 import me.toy.atdd.subwayservice.auth.domain.LoginMember;
 import me.toy.atdd.subwayservice.member.application.MemberService;
 import me.toy.atdd.subwayservice.member.dto.MemberRequest;
@@ -44,19 +45,19 @@ public class MemberController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<MemberResponse> findMemberOfMine(LoginMember loginMember) {
+    public ResponseEntity<MemberResponse> findMemberOfMine(@AuthenticationPrincipal LoginMember loginMember) {
         MemberResponse memberResponse = memberService.findMember(loginMember.getId());
         return ResponseEntity.ok().body(memberResponse);
     }
 
     @PutMapping("/me")
-    public ResponseEntity<MemberResponse> updateMemberOfMine(LoginMember loginMember, @RequestBody MemberRequest memberRequest) {
+    public ResponseEntity<MemberResponse> updateMemberOfMine(@AuthenticationPrincipal LoginMember loginMember, @RequestBody MemberRequest memberRequest) {
         memberService.updateMember(loginMember.getId(), memberRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/me")
-    public ResponseEntity<MemberResponse> deleteMemberOfMind(LoginMember loginMember) {
+    public ResponseEntity<MemberResponse> deleteMemberOfMind(@AuthenticationPrincipal LoginMember loginMember) {
         memberService.deleteMember(loginMember.getId());
         return ResponseEntity.noContent().build();
     }
