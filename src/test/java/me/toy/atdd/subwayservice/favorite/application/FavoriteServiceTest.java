@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,6 +59,18 @@ public class FavoriteServiceTest {
     @DisplayName("즐겨찾기 생성")
     @Test
     void createFavorite() {
+        given(천호역.getId()).willReturn(1L);
+        ReflectionTestUtils.setField(천호역, "id", 1L);
+
+        given(잠실역.getId()).willReturn(2L);
+        ReflectionTestUtils.setField(잠실역, "id", 2L);
+
+        given(천호역.isSameStation(anyLong())).willCallRealMethod();
+        given(잠실역.isSameStation(anyLong())).willCallRealMethod();
+
+        given(즐겨찾기.getSource()).willReturn(천호역);
+        given(즐겨찾기.getTarget()).willReturn(잠실역);
+
         given(memberRepository.findById(any())).willReturn(Optional.of(사용자));
         given(stationRepository.findAllByIdIn(anyList())).willReturn(Arrays.asList(천호역, 잠실역));
         given(favoriteRepository.save(any())).willReturn(즐겨찾기);
@@ -71,6 +84,34 @@ public class FavoriteServiceTest {
         assertThat(favoriteResponse.getTarget().getId()).isEqualTo(잠실역.getId());
     }
 
+    @DisplayName("즐겨찾기 조회")
+    @Test
+    void getFavorite() {
+        given(favoriteRepository.findAllByMemberId(any())).willReturn(Arrays.asList(즐겨찾기));
+
+        given(즐겨찾기.getSource()).willReturn(천호역);
+        given(즐겨찾기.getTarget()).willReturn(잠실역);
+
+        LoginMember loginMember = new LoginMember(사용자.getId(), 사용자.getEmail(), 사용자.getAge());
+        List<FavoriteResponse> favorites = favoriteService.getFavorites(loginMember);
+
+        assertThat(favorites.size()).isEqualTo(1);
+        assertThat(favorites.get(0).getSource().getName()).isEqualTo(천호역.getName());
+        assertThat(favorites.get(0).getTarget().getName()).isEqualTo(잠실역.getName());
+    }
+
+    @DisplayName("즐겨찾기 삭제")
+    @Test
+    void deleteFavorite() {
+        given(favoriteRepository.findByIdAndMemberId(any(), any())).willReturn(Optional.of(즐겨찾기));
+
+        LoginMember loginMember = new LoginMember(사용자.getId(), 사용자.getEmail(), 사용자.getAge());
+        favoriteService.deleteFavorite(loginMember, 즐겨찾기.getId());
+
+        List<FavoriteResponse> favorites = favoriteService.getFavorites(loginMember);
+        assertThat(favorites.size()).isEqualTo(0);
+    }
+
     private Member makeMockMember(long id, String email, int age) {
         Member member = mock(Member.class);
         given(member.getId()).willReturn(id);
@@ -82,18 +123,12 @@ public class FavoriteServiceTest {
 
     private Station makeMockStation(long id, String name) {
         Station station = mock(Station.class);
-        given(station.getId()).willReturn(id);
-        given(station.getName()).willReturn(name);
-        ReflectionTestUtils.setField(station, "id", id);
-        given(station.isSameStation(anyLong())).willCallRealMethod();
         return station;
     }
 
     private Favorite makeMockFavorite(long id, Station source, Station target) {
         Favorite favorite = mock(Favorite.class);
         given(favorite.getId()).willReturn(id);
-        given(favorite.getSource()).willReturn(source);
-        given(favorite.getTarget()).willReturn(target);
         return favorite;
     }
 
