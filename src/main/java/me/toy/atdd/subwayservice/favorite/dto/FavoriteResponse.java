@@ -3,6 +3,7 @@ package me.toy.atdd.subwayservice.favorite.dto;
 import me.toy.atdd.subwayservice.favorite.domain.Favorite;
 import me.toy.atdd.subwayservice.station.dto.StationResponse;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,5 +42,9 @@ public class FavoriteResponse {
 
     public StationResponse getTarget() {
         return target;
+    }
+
+    public List<StationResponse> getList() {
+        return Arrays.asList(source, target);
     }
 }

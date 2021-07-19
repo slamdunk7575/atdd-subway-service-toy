@@ -6,6 +6,7 @@ import me.toy.atdd.subwayservice.favorite.application.FavoriteService;
 import me.toy.atdd.subwayservice.favorite.domain.Favorite;
 import me.toy.atdd.subwayservice.favorite.dto.FavoriteRequest;
 import me.toy.atdd.subwayservice.favorite.dto.FavoriteResponse;
+import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +35,11 @@ public class FavoriteController {
         return ResponseEntity.ok(favoriteService.getFavorites(loginMember));
     }
 
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<FavoriteResponse> deleteFavorite(@AuthenticationPrincipal LoginMember loginMember,
+                                                           @PathVariable(value = "id") Long favoriteId) {
+        favoriteService.deleteFavorite(loginMember, favoriteId);
+        return ResponseEntity.noContent().build();
+    }
 
 }

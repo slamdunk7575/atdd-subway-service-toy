@@ -77,4 +77,10 @@ public class FavoriteService {
         List<Favorite> favorites = favoriteRepository.findAllByMemberId(loginMember.getId());
         return FavoriteResponse.ofList(favorites);
     }
+
+    public void deleteFavorite(LoginMember loginMember, Long favoriteId) {
+        Favorite favorite = favoriteRepository.findByIdAndMemberId(favoriteId, loginMember.getId())
+                .orElseThrow(() -> new FavoriteValidationException("즐겨찾기가 존재하지 않습니다."));
+        favoriteRepository.delete(favorite);
+    }
 }
