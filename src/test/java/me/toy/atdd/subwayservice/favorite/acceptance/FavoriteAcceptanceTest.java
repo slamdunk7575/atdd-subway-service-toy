@@ -16,12 +16,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
+import java.util.*;
 import static me.toy.atdd.subwayservice.line.acceptance.LineAcceptanceTest.지하철_노선_등록되어_있음;
 import static me.toy.atdd.subwayservice.line.acceptance.LineSectionAcceptanceTest.지하철_노선에_지하철역_등록_요청;
 import static me.toy.atdd.subwayservice.member.MemberAcceptanceTest.회원_로그인_요청;
@@ -72,14 +67,26 @@ public class FavoriteAcceptanceTest extends AcceptanceTest {
         즐겨찾기_생성됨(즐겨찾기_잠실역_문정역_생성_결과);
 
         // 즐겨찾기 조회
-        ExtractableResponse<Response> 즐겨찾기_목록_조회_요청_결과 = 즐겨찾기_목록_조회_요청(accessTokenMember1);
-        즐겨찾기_목록_확인(즐겨찾기_목록_조회_요청_결과, Arrays.asList("천호역", "잠실역"));
+        ExtractableResponse<Response> 즐겨찾기_목록_조회_결과 = 즐겨찾기_목록_조회_요청(accessTokenMember1);
+        즐겨찾기_목록_확인(즐겨찾기_목록_조회_결과, Arrays.asList("천호역", "잠실역"));
 
 
         // 즐겨찾기 삭제
-        ExtractableResponse<Response> 즐겨찾기_삭제_요청_결과 = 즐겨찾기_삭제_요청(accessTokenMember1, 즐겨찾기_천호역_잠실역_생성_결과);
-        즐겨찾기_삭제됨(즐겨찾기_삭제_요청_결과);
+        ExtractableResponse<Response> 즐겨찾기_삭제_결과 = 즐겨찾기_삭제_요청(accessTokenMember1, 즐겨찾기_천호역_잠실역_생성_결과);
+        즐겨찾기_삭제됨(즐겨찾기_삭제_결과);
         즐겨찾기_목록_확인(즐겨찾기_목록_조회_요청(accessTokenMember1), Arrays.asList("잠실역"));
+    }
+
+    @DisplayName("다른 회원의 즐겨찾기는 삭제할 수 없다.")
+    @Test
+    void notDeleteFavorite() {
+        // 즐겨찾기 생성
+        ExtractableResponse<Response> 즐겨찾기_잠실역_문정역_생성_결과 = 즐겨찾기_생성_요청(accessTokenMember2, 잠실역, 문정역);
+        즐겨찾기_생성됨(즐겨찾기_잠실역_문정역_생성_결과);
+
+        // 즐겨찾기 삭제
+        ExtractableResponse<Response> 즐겨찾기_삭제_결과 = 즐겨찾기_삭제_요청(accessTokenMember1, 즐겨찾기_잠실역_문정역_생성_결과);
+        즐겨찾기_삭제_실패(즐겨찾기_삭제_결과);
     }
 
     public static ExtractableResponse<Response> 즐겨찾기_생성_요청(String accessToken, StationResponse sourceStation, StationResponse targetStation) {
@@ -133,5 +140,9 @@ public class FavoriteAcceptanceTest extends AcceptanceTest {
 
     public static void 즐겨찾기_삭제됨(ExtractableResponse<Response> 즐겨찾기_삭제_요청_결과) {
         assertThat(즐겨찾기_삭제_요청_결과.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private void 즐겨찾기_삭제_실패(ExtractableResponse<Response> 즐겨찾기_삭제_결과) {
+        assertThat(즐겨찾기_삭제_결과.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
