@@ -113,5 +113,4 @@ public class PathAcceptanceTest extends AcceptanceTest {
     public void 지하철_경로_조회_실패함(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
-
 }
